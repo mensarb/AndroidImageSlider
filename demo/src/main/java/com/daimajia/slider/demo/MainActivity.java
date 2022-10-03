@@ -75,9 +75,9 @@ public class MainActivity extends AppCompatActivity implements BaseSliderView.On
     
     private HashMap<String, Integer> getFileMap(){
         HashMap<String,Integer> map = new HashMap<String, Integer>();
-        map.put("Hannibal",R.drawable.hannibal);
-        map.put("Big Bang Theory",R.drawable.bigbang);
-        map.put("House of Cards",R.drawable.house);
+        map.put("Hannibal", R.drawable.hannibal);
+        map.put("Big Bang Theory", R.drawable.bigbang);
+        map.put("House of Cards", R.drawable.house);
         map.put("Game of Thrones", R.drawable.game_of_thrones);
         return map;
     }

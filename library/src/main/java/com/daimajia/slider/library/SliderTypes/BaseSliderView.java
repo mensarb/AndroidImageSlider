@@ -127,18 +127,16 @@ public abstract class BaseSliderView {
      * @return
      */
     public BaseSliderView image(File file){
-        if(mUrl != null || mRes != 0){
-            throw new IllegalStateException("Call multi image function," +
-                    "you only have permission to call it once");
+        if (mUrl != null || mRes != 0){
+            throw new IllegalStateException("Call multi image function," + "you only have permission to call it once");
         }
         mFile = file;
         return this;
     }
 
     public BaseSliderView image(int res){
-        if(mUrl != null || mFile != null){
-            throw new IllegalStateException("Call multi image function," +
-                    "you only have permission to call it once");
+        if (mUrl != null || mFile != null){
+            throw new IllegalStateException("Call multi image function," + "you only have permission to call it once");
         }
         mRes = res;
         return this;
