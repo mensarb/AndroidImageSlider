@@ -1,12 +1,10 @@
 package com.daimajia.slider.library.Tricks;
 
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-
+import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
-
 import com.daimajia.slider.library.SliderAdapter;
 
 /**
@@ -14,11 +12,8 @@ import com.daimajia.slider.library.SliderAdapter;
  * Thanks to: https://github.com/antonyt/InfiniteViewPager
  */
 public class InfinitePagerAdapter extends PagerAdapter {
-
-    private static final String TAG = "InfinitePagerAdapter";
-    private static final boolean DEBUG = false;
-
-    private SliderAdapter adapter;
+    
+    private final SliderAdapter adapter;
 
     public InfinitePagerAdapter(SliderAdapter adapter) {
         this.adapter = adapter;
@@ -42,27 +37,24 @@ public class InfinitePagerAdapter extends PagerAdapter {
         return adapter.getCount();
     }
 
+    @NonNull
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(@NonNull ViewGroup container, int position) {
         if(getRealCount() == 0){
             return null;
         }
         int virtualPosition = position % getRealCount();
-        debug("instantiateItem: real position: " + position);
-        debug("instantiateItem: virtual position: " + virtualPosition);
 
         // only expose virtual position to the inner adapter
         return adapter.instantiateItem(container, virtualPosition);
     }
 
     @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
+    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         if(getRealCount() == 0){
             return;
         }
         int virtualPosition = position % getRealCount();
-        debug("destroyItem: real position: " + position);
-        debug("destroyItem: virtual position: " + virtualPosition);
 
         // only expose virtual position to the inner adapter
         adapter.destroyItem(container, virtualPosition, object);
@@ -73,12 +65,12 @@ public class InfinitePagerAdapter extends PagerAdapter {
      */
 
     @Override
-    public void finishUpdate(ViewGroup container) {
+    public void finishUpdate(@NonNull ViewGroup container) {
         adapter.finishUpdate(container);
     }
 
     @Override
-    public boolean isViewFromObject(View view, Object object) {
+    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
         return adapter.isViewFromObject(view, object);
     }
 
@@ -93,17 +85,7 @@ public class InfinitePagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public void startUpdate(ViewGroup container) {
+    public void startUpdate(@NonNull ViewGroup container) {
         adapter.startUpdate(container);
-    }
-
-    /*
-     * End delegation
-     */
-
-    private void debug(String message) {
-        if (DEBUG) {
-            Log.d(TAG, message);
-        }
     }
 }

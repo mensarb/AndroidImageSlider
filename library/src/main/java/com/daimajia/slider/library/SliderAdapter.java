@@ -1,89 +1,113 @@
 package com.daimajia.slider.library;
 
-import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.viewpager.widget.PagerAdapter;
-
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
-
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A slider adapter
  */
 public class SliderAdapter extends PagerAdapter implements BaseSliderView.ImageLoadListener{
+    
+    private final ArrayList<BaseSliderView> list = new ArrayList<>();
 
-    private Context mContext;
-    private ArrayList<BaseSliderView> mImageContents;
+    public SliderAdapter(){
 
-    public SliderAdapter(Context context){
-        mContext = context;
-        mImageContents = new ArrayList<BaseSliderView>();
     }
 
     public <T extends BaseSliderView> void addSlider(T slider){
+        addSlider(slider, list.size());
+    }
+    
+    public <T extends BaseSliderView> void addSlider(T slider, int index){
         slider.setOnImageLoadListener(this);
-        mImageContents.add(slider);
+        list.add(index, slider);
         notifyDataSetChanged();
     }
-
-    public BaseSliderView getSliderView(int position){
-        if(position < 0 || position >= mImageContents.size()){
-            return null;
-        }else{
-            return mImageContents.get(position);
+    
+    public <T extends BaseSliderView> void addSlider(List<T> sliders){
+        addSlider(sliders, list.size());
+    }
+    
+    public <T extends BaseSliderView> void addSlider(List<T> sliders, int index){
+        setOnImageLoadListener(sliders);
+        list.addAll(index, sliders);
+        notifyDataSetChanged();
+    }
+    
+    private <T extends BaseSliderView> void setOnImageLoadListener(List<T> sliders){
+        for(int i=0; i<sliders.size(); i++){
+            sliders.get(i).setOnImageLoadListener(this);
         }
+    }
+
+    @Nullable
+    public BaseSliderView getSliderView(int position){
+        if (0 <= position && position < list.size()){
+            return list.get(position);
+        }
+        return null;
     }
 
     @Override
-    public int getItemPosition(Object object) {
+    public int getItemPosition(@NonNull Object object) {
         return POSITION_NONE;
     }
 
-    public <T extends BaseSliderView> void removeSlider(T slider){
-        if(mImageContents.contains(slider)){
-            mImageContents.remove(slider);
+    public <T extends BaseSliderView> void removeSlider(@NonNull T slider){
+        if (list.contains(slider)){
+            list.remove(slider);
             notifyDataSetChanged();
         }
     }
-
+    
     public void removeSliderAt(int position){
-        if(mImageContents.size() > position){
-            mImageContents.remove(position);
+        if (list.size() > position){
+            list.remove(position);
             notifyDataSetChanged();
         }
     }
-
+    
     public void removeAllSliders(){
-        mImageContents.clear();
+        list.clear();
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return mImageContents.size();
+        return list.size();
     }
 
     @Override
-    public boolean isViewFromObject(View view, Object object) {
-        return view==object;
+    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
+        return view == object;
     }
 
     @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
+    public void destroyItem(ViewGroup container, int position, @NonNull Object object) {
         container.removeView((View) object);
     }
 
+    @NonNull
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        BaseSliderView b = mImageContents.get(position);
-        View v = b.getView();
-        container.addView(v);
-        return v;
+        BaseSliderView sliderView = list.get(position);
+        View view = sliderView.getView();
+        container.addView(view);
+        return view;
     }
-
+    
+    /**
+     * =============================================================================================
+     * {@link BaseSliderView.ImageLoadListener}
+     * =============================================================================================
+     */
+    
     @Override
     public void onStart(BaseSliderView target) {
 
@@ -91,15 +115,13 @@ public class SliderAdapter extends PagerAdapter implements BaseSliderView.ImageL
 
     /**
      * When image download error, then remove.
-     * @param result
-     * @param target
      */
     @Override
     public void onEnd(boolean result, BaseSliderView target) {
-        if(target.isErrorDisappear() == false || result == true){
+        if (!target.isErrorDisappear() || result){
             return;
         }
-        for (BaseSliderView slider: mImageContents){
+        for (BaseSliderView slider: list){
             if(slider.equals(target)){
                 removeSlider(target);
                 break;

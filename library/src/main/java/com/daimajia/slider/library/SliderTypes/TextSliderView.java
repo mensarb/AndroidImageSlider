@@ -1,12 +1,8 @@
 package com.daimajia.slider.library.SliderTypes;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.daimajia.slider.library.R;
+import com.daimajia.slider.library.databinding.RenderTypeTextBinding;
 
 /**
  * This is a slider with a description TextView.
@@ -19,15 +15,9 @@ public class TextSliderView extends BaseSliderView {
 
     @Override
     public View getView() {
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.render_type_text,null);
-
-        ImageView target = view.findViewById(R.id.daimajia_slider_image);
-        TextView description = view.findViewById(R.id.description);
-
-        description.setText(getDescription());
-
-        bindEventAndShow(view, target);
-
-        return view;
+        RenderTypeTextBinding binding = RenderTypeTextBinding.inflate(getLayoutInflater());
+        binding.description.setText(getDescription());
+        bindEventAndShow(binding.getRoot(), binding.image);
+        return binding.getRoot();
     }
 }

@@ -2,6 +2,7 @@ package com.daimajia.slider.library.SliderTypes;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -60,6 +61,10 @@ public abstract class BaseSliderView {
 
     protected BaseSliderView(Context context) {
         mContext = context;
+    }
+    
+    protected LayoutInflater getLayoutInflater(){
+        return LayoutInflater.from(getContext());
     }
 
     /**
@@ -185,18 +190,15 @@ public abstract class BaseSliderView {
 
     /**
      * When you want to implement your own slider view, please call this method in the end in `getView()` method
-     * @param v the whole view
+     * @param view the whole view
      * @param targetImageView where to place image
      */
-    protected void bindEventAndShow(final View v, ImageView targetImageView){
-        final BaseSliderView me = this;
+    protected void bindEventAndShow(View view, ImageView targetImageView){
+        BaseSliderView slider = this;
 
-        v.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            if(mOnSliderClickListener != null){
-                mOnSliderClickListener.onSliderClick(me);
-            }
+        view.setOnClickListener(v -> {
+            if (mOnSliderClickListener != null){
+                mOnSliderClickListener.onSliderClick(slider);
             }
         });
 
@@ -204,67 +206,65 @@ public abstract class BaseSliderView {
             return;
 
         if (mLoadListener != null) {
-            mLoadListener.onStart(me);
+            mLoadListener.onStart(slider);
         }
 
-        Picasso p = (mPicasso != null) ? mPicasso : Picasso.get();
-        RequestCreator rq = null;
-        if(mUrl!=null){
-            rq = p.load(mUrl);
-        }else if(mFile != null){
-            rq = p.load(mFile);
-        }else if(mRes != 0){
-            rq = p.load(mRes);
+        Picasso picasso = (mPicasso != null) ? mPicasso : Picasso.get();
+        RequestCreator requestCreator = null;
+        if (mUrl != null){
+            requestCreator = picasso.load(mUrl);
+        }else if (mFile != null){
+            requestCreator = picasso.load(mFile);
+        }else if (mRes != 0){
+            requestCreator = picasso.load(mRes);
         }else{
             return;
         }
-
-        if(rq == null){
+    
+        if (requestCreator == null){
             return;
         }
-
-        if(getEmpty() != 0){
-            rq.placeholder(getEmpty());
+    
+        if (getEmpty() != 0){
+            requestCreator.placeholder(getEmpty());
         }
-
-        if(getError() != 0){
-            rq.error(getError());
+    
+        if (getError() != 0){
+            requestCreator.error(getError());
         }
 
         switch (mScaleType){
             case Fit:
-                rq.fit();
+                requestCreator.fit();
                 break;
             case CenterCrop:
-                rq.fit().centerCrop();
+                requestCreator.fit().centerCrop();
                 break;
             case CenterInside:
-                rq.fit().centerInside();
+                requestCreator.fit().centerInside();
                 break;
         }
 
-        rq.into(targetImageView, new Callback() {
+        requestCreator.into(targetImageView, new Callback() {
             @Override
             public void onSuccess() {
-                if(v.findViewById(R.id.loading_bar) != null){
-                    v.findViewById(R.id.loading_bar).setVisibility(View.INVISIBLE);
+                if (view.findViewById(R.id.loading_bar) != null){
+                    view.findViewById(R.id.loading_bar).setVisibility(View.INVISIBLE);
                 }
             }
 
             @Override
             public void onError(Exception e) {
-                if(mLoadListener != null){
-                    mLoadListener.onEnd(false,me);
+                if (mLoadListener != null){
+                    mLoadListener.onEnd(false, slider);
                 }
-                if(v.findViewById(R.id.loading_bar) != null){
-                    v.findViewById(R.id.loading_bar).setVisibility(View.INVISIBLE);
+                if (view.findViewById(R.id.loading_bar) != null){
+                    view.findViewById(R.id.loading_bar).setVisibility(View.INVISIBLE);
                 }
             }
         });
    }
-
-
-
+   
     public BaseSliderView setScaleType(ScaleType type){
         mScaleType = type;
         return this;
@@ -302,8 +302,8 @@ public abstract class BaseSliderView {
     }
 
     public interface ImageLoadListener{
-        public void onStart(BaseSliderView target);
-        public void onEnd(boolean result,BaseSliderView target);
+        void onStart(BaseSliderView target);
+        void onEnd(boolean result,BaseSliderView target);
     }
 
     /**

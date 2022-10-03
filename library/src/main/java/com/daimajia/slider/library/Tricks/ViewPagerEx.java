@@ -208,7 +208,7 @@ public class ViewPagerEx extends ViewGroup{
     private boolean mCalledSuper;
     private int mDecorChildCount;
 
-    private ArrayList<OnPageChangeListener> mOnPageChangeListeners = new ArrayList<>();
+    private final ArrayList<OnPageChangeListener> mOnPageChangeListeners = new ArrayList<>();
     private OnPageChangeListener mInternalPageChangeListener;
     private OnAdapterChangeListener mAdapterChangeListener;
     private PageTransformer mPageTransformer;
