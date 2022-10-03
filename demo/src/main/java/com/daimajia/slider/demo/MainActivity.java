@@ -14,12 +14,10 @@ import com.daimajia.slider.library.Animations.DescriptionAnimation;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
-import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import java.util.HashMap;
 
 
-public class MainActivity extends AppCompatActivity implements BaseSliderView.OnSliderClickListener,
-        ViewPagerEx.OnPageChangeListener{
+public class MainActivity extends AppCompatActivity implements BaseSliderView.OnSliderClickListener{
 
     private ActivityMainBinding binding;
 
@@ -55,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements BaseSliderView.On
         binding.slider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
         binding.slider.setCustomAnimation(new DescriptionAnimation());
         binding.slider.setDuration(4000);
-        binding.slider.addOnPageChangeListener(this);
     
         binding.transformers.setAdapter(new TransformerAdapter(this));
         binding.transformers.setOnItemClickListener((parent, view, position, id) -> {
@@ -120,20 +117,5 @@ public class MainActivity extends AppCompatActivity implements BaseSliderView.On
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-    
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-    
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-    
     }
 }

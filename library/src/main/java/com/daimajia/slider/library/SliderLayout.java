@@ -9,6 +9,7 @@ import android.view.MotionEvent;
 import android.view.animation.Interpolator;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.viewpager.widget.PagerAdapter;
 import com.daimajia.slider.library.Animations.BaseAnimationInterface;
 import com.daimajia.slider.library.Indicators.PagerIndicator;
@@ -40,8 +41,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * SliderLayout is compound layout. This is combined with {@link com.daimajia.slider.library.Indicators.PagerIndicator}
- * and {@link com.daimajia.slider.library.Tricks.ViewPagerEx} .
+ * SliderLayout is compound layout. This is combined with {@link PagerIndicator}
+ * and {@link ViewPagerEx} .
  *
  * There is some properties you can set in XML:
  *
@@ -89,44 +90,11 @@ public class SliderLayout extends RelativeLayout{
      * InfiniteViewPager is extended from ViewPagerEx. As the name says, it can scroll without bounder.
      */
     private final InfiniteViewPager viewPager;
-
-    /**
-     * InfiniteViewPager adapter.
-     */
-    private final SliderAdapter adapter;
-
-    /**
-     * {@link com.daimajia.slider.library.Tricks.ViewPagerEx} indicator.
-     */
-    private PagerIndicator indicator;
-
-
-    /**
-     * A timer and a TimerTask using to cycle the {@link com.daimajia.slider.library.Tricks.ViewPagerEx}.
-     */
-    private Timer mCycleTimer;
-    private TimerTask mCycleTask;
-
-    /**
-     * For resuming the cycle, after user touch or click the {@link com.daimajia.slider.library.Tricks.ViewPagerEx}.
-     */
-    private Timer mResumingTimer;
-    private TimerTask mResumingTask;
-
-    /**
-     * If {@link com.daimajia.slider.library.Tricks.ViewPagerEx} is Cycling
-     */
-    private boolean mCycling;
-
-    /**
-     * Determine if auto recover after user touch the {@link com.daimajia.slider.library.Tricks.ViewPagerEx}
-     */
-    private boolean mAutoRecover = true;
-
+    
     private int mTransformerId;
 
     /**
-     * {@link com.daimajia.slider.library.Tricks.ViewPagerEx} transformer time span.
+     * {@link ViewPagerEx} transformer time span.
      */
     private int mTransformerSpan = 1100;
 
@@ -138,12 +106,12 @@ public class SliderLayout extends RelativeLayout{
     private long mSliderDuration = 4000;
 
     /**
-     * Visibility of {@link com.daimajia.slider.library.Indicators.PagerIndicator}
+     * Visibility of {@link PagerIndicator}
      */
     private PagerIndicator.IndicatorVisibility mIndicatorVisibility = PagerIndicator.IndicatorVisibility.Visible;
 
     /**
-     * {@link com.daimajia.slider.library.Tricks.ViewPagerEx} 's transformer
+     * {@link ViewPagerEx} 's transformer
      */
     private BaseTransformer mViewPagerTransformer;
 
@@ -153,7 +121,7 @@ public class SliderLayout extends RelativeLayout{
     private BaseAnimationInterface mCustomAnimation;
 
     /**
-     * {@link com.daimajia.slider.library.Indicators.PagerIndicator} shape, rect or oval.
+     * {@link PagerIndicator} shape, rect or oval.
      */
 
     public SliderLayout(Context context) {
@@ -197,6 +165,28 @@ public class SliderLayout extends RelativeLayout{
             }
             return false;
         });
+        
+        viewPager.addOnPageChangeListener(new ViewPagerEx.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels){
+                //not used
+            }
+    
+            @Override
+            public void onPageSelected(int position){
+                if (selectionListener != null){
+                    BaseSliderView sliderView = adapter.getSliderView(position);
+                    if (sliderView != null){
+                        selectionListener.onSliderViewSelected(sliderView, position);
+                    }
+                }
+            }
+    
+            @Override
+            public void onPageScrollStateChanged(int state){
+                //not used
+            }
+        });
 
         attributes.recycle();
         setPresetIndicator(PresetIndicators.Center_Bottom);
@@ -207,17 +197,15 @@ public class SliderLayout extends RelativeLayout{
             startAutoCycle();
         }
     }
+    
+    /**
+     * =============================================================================================
+     * indicator
+     * =============================================================================================
+     */
 
-    public void addOnPageChangeListener(ViewPagerEx.OnPageChangeListener onPageChangeListener){
-        if (onPageChangeListener != null){
-            viewPager.addOnPageChangeListener(onPageChangeListener);
-        }
-    }
-
-    public void removeOnPageChangeListener(ViewPagerEx.OnPageChangeListener onPageChangeListener) {
-        viewPager.removeOnPageChangeListener(onPageChangeListener);
-    }
-
+    private PagerIndicator indicator;
+    
     public void setCustomIndicator(PagerIndicator indicator){
         if (this.indicator != null){
             this.indicator.destroySelf();
@@ -227,6 +215,15 @@ public class SliderLayout extends RelativeLayout{
         this.indicator.setViewPager(viewPager);
         this.indicator.redraw();
     }
+    
+    /**
+     * =============================================================================================
+     * adapter
+     * =============================================================================================
+     */
+
+    private final SliderAdapter adapter;
+    @Nullable private SliderViewSelectionListener selectionListener;
 
     public <T extends BaseSliderView> void addSlider(T slider){
         adapter.addSlider(slider);
@@ -243,7 +240,40 @@ public class SliderLayout extends RelativeLayout{
     public <T extends BaseSliderView> void addSlider(List<T> sliders, int index){
         adapter.addSlider(sliders, index);
     }
+    
+    @Nullable
+    public BaseSliderView getSliderView(int position){
+        return adapter.getSliderView(position);
+    }
+    
+    @Nullable
+    public SliderViewSelectionListener getSelectionListener(){
+        return selectionListener;
+    }
+    
+    public void setSelectionListener(@Nullable SliderViewSelectionListener selectionListener){
+        this.selectionListener = selectionListener;
+    }
+    
+    public interface SliderViewSelectionListener{
+        void onSliderViewSelected(@NonNull BaseSliderView sliderView, int position);
+    }
+    
+    /**
+     * =============================================================================================
+     * cycling
+     * =============================================================================================
+     */
 
+    private Timer mCycleTimer;
+    private TimerTask mCycleTask;
+    
+    private Timer mResumingTimer;
+    private TimerTask mResumingTask;
+    
+    private boolean mCycling;
+    private boolean mAutoRecover = true;
+    
     private final android.os.Handler mh = new android.os.Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -553,7 +583,7 @@ public class SliderLayout extends RelativeLayout{
     }
 
     /**
-     * get the {@link com.daimajia.slider.library.Indicators.PagerIndicator} instance.
+     * get the {@link PagerIndicator} instance.
      * You can manipulate the properties of the indicator.
      * @return
      */
