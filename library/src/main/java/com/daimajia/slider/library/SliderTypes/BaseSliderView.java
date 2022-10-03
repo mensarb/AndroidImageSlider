@@ -207,7 +207,7 @@ public abstract class BaseSliderView {
             mLoadListener.onStart(me);
         }
 
-        Picasso p = (mPicasso != null) ? mPicasso : Picasso.with(mContext);
+        Picasso p = (mPicasso != null) ? mPicasso : Picasso.get();
         RequestCreator rq = null;
         if(mUrl!=null){
             rq = p.load(mUrl);
@@ -243,7 +243,7 @@ public abstract class BaseSliderView {
                 break;
         }
 
-        rq.into(targetImageView,new Callback() {
+        rq.into(targetImageView, new Callback() {
             @Override
             public void onSuccess() {
                 if(v.findViewById(R.id.loading_bar) != null){
@@ -252,7 +252,7 @@ public abstract class BaseSliderView {
             }
 
             @Override
-            public void onError() {
+            public void onError(Exception e) {
                 if(mLoadListener != null){
                     mLoadListener.onEnd(false,me);
                 }
