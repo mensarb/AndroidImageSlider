@@ -100,22 +100,18 @@ public class MainActivity extends AppCompatActivity implements BaseSliderView.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.action_custom_indicator:
-                binding.slider.setCustomIndicator(findViewById(R.id.custom_indicator));
-                break;
-            case R.id.action_custom_child_animation:
-                binding.slider.setCustomAnimation(new ChildAnimationExample());
-                break;
-            case R.id.action_restore_default:
-                binding.slider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
-                binding.slider.setCustomAnimation(new DescriptionAnimation());
-                break;
-            case R.id.action_github:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/daimajia/AndroidImageSlider"));
-                startActivity(browserIntent);
-                break;
+        if (item.getItemId() == R.id.action_custom_indicator){
+            binding.slider.setCustomIndicator(findViewById(R.id.custom_indicator));
+        }else if (item.getItemId() == R.id.action_custom_child_animation){
+            binding.slider.setCustomAnimation(new ChildAnimationExample());
+        }else if (item.getItemId() == R.id.action_restore_default){
+            binding.slider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
+            binding.slider.setCustomAnimation(new DescriptionAnimation());
+        }else if (item.getItemId() == R.id.action_github){
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/daimajia/AndroidImageSlider"));
+            startActivity(browserIntent);
         }
+
         return super.onOptionsItemSelected(item);
     }
 }

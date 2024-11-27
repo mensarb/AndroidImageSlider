@@ -3,7 +3,6 @@ package com.daimajia.slider.demo;
 import android.util.Log;
 import android.view.View;
 
-import com.daimajia.androidanimations.library.attention.StandUpAnimator;
 import com.daimajia.slider.library.Animations.BaseAnimationInterface;
 
 public class ChildAnimationExample implements BaseAnimationInterface {
@@ -35,16 +34,15 @@ public class ChildAnimationExample implements BaseAnimationInterface {
 
     @Override
     public void onNextItemAppear(View view) {
-
         View descriptionLayout = view.findViewById(com.daimajia.slider.library.R.id.description_layout);
-        if(descriptionLayout!=null){
+        if (descriptionLayout != null) {
             view.findViewById(com.daimajia.slider.library.R.id.description_layout).setVisibility(View.VISIBLE);
 //            ValueAnimator animator = ObjectAnimator.ofFloat(
 //                    descriptionLayout, "y", -descriptionLayout.getHeight(),
 //                    0).setDuration(500);
 //            animator.start();
 //            new BounceInAnimator().animate(descriptionLayout);
-            new StandUpAnimator().animate(descriptionLayout);
+            //new StandUpAnimator().animate(descriptionLayout);
         }
         Log.e(TAG,"onCurrentItemDisappear called");
     }
